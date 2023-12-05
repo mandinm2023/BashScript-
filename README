@@ -1,0 +1,114 @@
+README
+
+DESCRIPTION
+This project was created for a final project in a Kali Bash class. The bash script checks for
+compliance on an UBUNTU 20.04 operating system. The script will check three CAT 1 STIGS and 2 CAT 2 STIGS and if the operating system is not compliant it will ask the user if they would like to take the necessary actions to make the system compliant. The specified STIGS and a description of each are listed below by STIG ID.
+
+SOURCE: https://public.cyber.mil/stigs/downloads/?_dl_facet_stigs=unix-linux
+
+STIG ID: UBTU-20-010012
+CAT: 1
+RULE ID: SV-238206r653793
+GROUP ID: V-238206
+The Ubuntu 20.04 operating system must ensure only users who need access to security functions are part of sudo group. The system restricts access to security functions through the use of access control mechanisms and by implementing least privilege capabilities. This can be done by using the first command that lists the users in the sudoer file and if there are any users listed that should not have sudo privileges, the next command is what to use to remove the user from the group.
+
+Check sudoer file
+$ grep sudo /etc/group
+
+Corrective Action
+$ sudo gpasswd -d <username> sudo
+
+
+STIG ID: UBTU-20-010405
+CAT: 1
+RULE ID: SV-238326r877396
+GROUP ID: V-238326
+The operating system must not have the telnet package installed. Passwords need to be protected at all times, and encryption is the standard method for protecting passwords. If passwords are not encrypted, they can be plainly read (i.e., clear text) and easily compromised. This command checks to see if the telnet package is installed and if it is, asks the user if they would like to uninstall it. If yes, uninstalls the package.
+
+Check for telnet package
+$ dpkg -l | grep telnetd
+
+Asks user and unistalls if needed.
+$ read -p "Would you like to uninstall telnet? y/n: " confirm
+if [[ "$confirm" == [yY] ]]; then
+        sudo apt-get remove telnetd && echo "Telnet package uninstalled"
+else
+        echo "Telnet package not installed."
+fi
+
+STIG ID: UBTU-20-010406
+CAT: 1
+RULE ID: SV-238327r654156
+GROUP ID: V-238327
+The Ubuntu operating system must not have the rsh-server package installed. It is important for operating systems to provide, or install by default, functionality exceeding requirements or mission objectives. These unnecessary capabilities or services are often overlooked and therefore may remain unsecured. They increase the risk to the platform by providing additional attack vectors. This command checks to see if the rsh-server package is installed. If so, asks the user if they would like to uninstall it. If yes, uninstalls the package.
+
+Checks for rsh-server package
+$ dpkg -l | grep rsh-server
+
+Asks user and uninstalls if needed
+$ read -p "Would you like to uninstall the rsh-server package? y/n: " confirm
+if [[ "$confirm" == [yY] ]]; then
+        sudo apt-get remove rsh-server
+        echo "rsh-server package uninstalled"
+else
+        echo "rsh-server package not installed."
+fi
+
+STIG ID: UBTU-20-010063
+CAT: 2
+RULE ID: SV-238230r853410
+GROUP ID: V-238230
+The Ubuntu operating system must implement multifactor authentication for remote access to privileged accounts in such a way that one of the factors is provided by a device separate from the system gaining access. This command checks to see if the required packages for multifactor authentication are installed on the system. If not installed, asks the user if they would like to install it and does so if the answer is yes.
+
+Checks for required multifactor authentication packages
+
+$ CheckPckg=$(dpkg -l | grep libpam-pkcs11)
+echo $CheckPckg
+
+If packages are not installed, asks the user to install and does so if user answers yes.
+
+$ if [[ -n "$CheckPckg" ]];then
+        echo "Packages are installed."
+else
+        read -p "Would you like to install the packages? y/n: " confirm
+                if [[ "$confirm" == [yY] ]]; then
+                        sudo apt install libpam-pkcs11
+                fi
+fi
+
+STIG ID: UBTU-20-010064
+CAT: 2
+RULE ID: SV-238231r853411
+GROUP ID: V-238231
+The Ubuntu operating system must accept Personal Identity Verification (PIV) credentials.
+The use of PIV credentials facilitates standardization and reduces the risk of unauthorized access. This command checks to see if the required package is installed. If not installed, asks the user if they would like to install it and does so if the answer is yes.
+
+Checks for package
+
+$ ChkP=$(dpkg -l | grep opensc-pkcs11)
+echo $ChkP
+
+If not installed, asks the user to install and does so if the user answers yes.
+
+$ if [[ -n "$ChkP" ]];then
+        echo "Package is installed."
+else
+        read -p "Would you like to install the package? y/n: " confirm1
+                if [[ "$confirm1" == [yY] ]]; then
+                        sudo apt-get install opensc-pkcs11
+                fi
+fi
+
+
+
+USAGE
+./final.sh	/home/ubuntu/BashScript
+
+
+
+
+
+
+
+
+
